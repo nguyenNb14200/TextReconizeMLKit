@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Read text on Photo</string>
+
+    // home screen
+    <string name="take_your_photo">Take Your Photo</string>
+    <string name="add_your_photo">Add Your Photo</string>
+
+    //read text screen
+    <string name="read_text">Read Text</string>
+
+</resources>
