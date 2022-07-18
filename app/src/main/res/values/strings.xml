@@ -7,5 +7,13 @@
 
     //read text screen
     <string name="read_text">Read Text</string>
+    <string name="result_text">Result text</string>
+    <string name="Translate">Translate</string>
 
+    // dialog
+    <string name="copy">Copy</string>
+    <string name="copy_another">Copy Another</string>
+    <string name="error_not_text">Not has any text here</string>
+    <string name="confirm">Confirm</string>
+    <string name="exit">Exit</string>
 </resources>

@@ -62,4 +62,18 @@ dependencies {
     // RxAndroid
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
+    //gson
+    implementation 'com.google.code.gson:gson:2.9.0'
+
+    // glide
+    implementation 'com.github.bumptech.glide:glide:4.13.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
+
+    //bottom sheet
+    implementation 'com.google.android.material:material:1.6.1'
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+
+    implementation 'com.google.firebase:firebase-ml-natural-language:22.0.1'
+    implementation 'com.google.firebase:firebase-ml-natural-language-translate-model:20.0.9'
+    implementation 'com.google.firebase:firebase-ml-natural-language-language-id-model:20.0.8'
 }

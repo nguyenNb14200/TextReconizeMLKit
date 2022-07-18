@@ -2,10 +2,12 @@ package com.training.textreconizemlkit.activities;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.webkit.PermissionRequest;
 import android.widget.LinearLayout;
@@ -104,7 +106,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private File createImageFile() throws IOException {
-
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
@@ -141,12 +142,6 @@ public class HomeActivity extends AppCompatActivity {
     private void goToEditPhotoScreen() {
         Dexter.withContext(HomeActivity.this).withPermissions("android.permission.READ_EXTERNAL_STORAGE", "android.permission.WRITE_EXTERNAL_STORAGE").withListener(new MultiplePermissionsListener() {
             public void onPermissionsChecked(MultiplePermissionsReport multiplePermissionsReport) {
-//                if (multiplePermissionsReport.areAllPermissionsGranted()) {
-//                    PolishPickerView.builder().setPhotoCount(1).start(HomeActivity.this);
-//                }
-//                if (multiplePermissionsReport.isAnyPermissionPermanentlyDenied()) {
-//                    DetailsDialog.showDetailsDialog(HomeActivity.this);
-//                }
 
                 Intent intent= new Intent();
                 intent.setType("image/*");
