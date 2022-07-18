@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "355691655960-1uaskbloe2q9htvq8cto1o20of969nvd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.training.textreconizemlkit",
+            "certificate_hash": "06f278f67efdc968e41f5b8f6fd80090f8ac2b5e"
+          }
+        },
+        {
           "client_id": "355691655960-gte00emsgj0e59cth1brtftleno3ve7n.apps.googleusercontent.com",
           "client_type": 3
         }

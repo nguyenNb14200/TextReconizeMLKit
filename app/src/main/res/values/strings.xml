@@ -16,4 +16,6 @@
     <string name="error_not_text">Not has any text here</string>
     <string name="confirm">Confirm</string>
     <string name="exit">Exit</string>
+    <string name="From">From</string>
+    <string name="To">To</string>
 </resources>
