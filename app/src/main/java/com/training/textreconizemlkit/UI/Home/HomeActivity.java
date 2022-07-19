@@ -1,15 +1,12 @@
-package com.training.textreconizemlkit.activities;
+package com.training.textreconizemlkit.UI.Home;
 
 import android.content.Context;
 import android.content.Intent;
-import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.View;
-import android.webkit.PermissionRequest;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -22,6 +19,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.training.textreconizemlkit.Common;
 import com.training.textreconizemlkit.R;
+import com.training.textreconizemlkit.UI.ReadText.ReadTextActivity;
 import com.training.textreconizemlkit.dialog.DetailsDialog;
 
 import java.io.File;
