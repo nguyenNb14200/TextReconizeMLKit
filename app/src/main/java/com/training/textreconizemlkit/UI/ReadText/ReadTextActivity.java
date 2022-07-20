@@ -4,34 +4,26 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.View;
-
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.firebase.ml.vision.FirebaseVision;
-import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 import com.google.gson.Gson;
-import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
+import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
@@ -56,11 +48,12 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     BottomSheetBehavior sheetBehavior;
     CustomDialogTranslate mCustomDialogTranslate;
     String fromLanguage = "";
-    String toLanguage   = "";
+    String toLanguage = "";
     TranslatorOptions options;
     final CopyHandler copyHandler = new CopyHandler(this);
     Translator modelTranslator;
     SweetAlertDialog pDialog;
+    private GraphicOverlay mGraphicOverlay;
     ReadTextPresenter mReadTextPresenter = new ReadTextPresenter(this, this);
 
     @Override
@@ -79,7 +72,7 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         try {
             initView();
         } catch (IOException e) {
-            Toast.makeText(this, "something is wrong, error: " + e.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "something is wrong, error: " + e, Toast.LENGTH_LONG).show();
             e.printStackTrace();
         }
         initBehavior();
@@ -91,6 +84,22 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         binding.bottomSheet.tvTextResult.setMovementMethod(new ScrollingMovementMethod());
     }
 
+    private Bitmap createScaleFactorUsingBitmap(Bitmap mSelectedImage) {
+        // Determine how much to scale down the image
+        float scaleFactor =
+                Math.max(
+                        (float) mSelectedImage.getWidth() / (float) binding.imPhotoView.getWidth(),
+                        (float) mSelectedImage.getHeight() / (float) binding.imPhotoView.getHeight());
+
+        Bitmap resizedBitmap =
+                Bitmap.createScaledBitmap(
+                        mSelectedImage,
+                        (int) (mSelectedImage.getWidth() / scaleFactor),
+                        (int) (mSelectedImage.getHeight() / scaleFactor),
+                        true);
+
+        return resizedBitmap;
+    }
 
     private void initData() {
         mCustomDialogTranslate = new CustomDialogTranslate(ReadTextActivity.this);
@@ -174,7 +183,7 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         mCustomDialogTranslate.binding.spnLanguageFrom.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-               mReadTextPresenter.fromLanguage = mCustomDialogTranslate.languages.get(position).languageCode;
+                mReadTextPresenter.fromLanguage = mCustomDialogTranslate.languages.get(position).languageCode;
             }
 
             @Override
@@ -184,7 +193,7 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         });
     }
 
-    private void setupProcessDialog(){
+    private void setupProcessDialog() {
         pDialog = new SweetAlertDialog(this, SweetAlertDialog.PROGRESS_TYPE);
         pDialog.getProgressHelper().setBarColor(Color.parseColor("#A5DC86"));
         pDialog.setTitleText("Downloading model translate");
@@ -198,7 +207,13 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
             imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
         }
         binding.imPhotoView.setImageBitmap(imageBitmap);
-
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                imageBitmap = createScaleFactorUsingBitmap(imageBitmap);
+                binding.imPhotoView.setImageBitmap(imageBitmap);
+            }
+        }, 2000);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
@@ -236,9 +251,32 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     }
 
     @Override
-    public void OnReadTextSuccess(String text) {
+    public void OnReadTextSuccess(FirebaseVisionText result) {
+
+        String[] resultTextMuntipleLine = {""};
+        String resultTextOneLine = "";
+
+        //draw line text
+        binding.graphicOverlay.clear();
+        for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
+            for (FirebaseVisionText.Line line : block.getLines()) {
+                for (FirebaseVisionText.Element element : line.getElements()) {
+                    GraphicOverlay.Graphic textGraphic = new TextGraphic(binding.graphicOverlay, element);
+                    binding.graphicOverlay.add(textGraphic);
+                }
+            }
+        }
+
+        for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
+            String blockText = block.getText();
+            Point[] blockCornerPoints = block.getCornerPoints();
+            Rect blockFrame = block.getBoundingBox();
+            resultTextMuntipleLine[0] = resultTextMuntipleLine[0] + "\n \n" + blockText;
+            resultTextOneLine = resultTextOneLine + block;
+        }
+
         Toast.makeText(ReadTextActivity.this, "Recognizer success", Toast.LENGTH_SHORT).show();
         sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        binding.bottomSheet.tvTextResult.setText(text);
+        binding.bottomSheet.tvTextResult.setText(resultTextMuntipleLine[0]);
     }
 }

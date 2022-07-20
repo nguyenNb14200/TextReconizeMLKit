@@ -1,5 +1,7 @@
 package com.training.textreconizemlkit.UI.ReadText;
 
+import com.google.firebase.ml.vision.text.FirebaseVisionText;
+
 public interface ActionWithText {
     void OpenDialogLoadingLanguage();
     void HideDialogLoadingLanguage();
@@ -7,5 +9,5 @@ public interface ActionWithText {
     void OnTranslateSuccess(String text);
     void OnTranslateFail(String text);
     void OnReadTextFail();
-    void OnReadTextSuccess(String text);
+    void OnReadTextSuccess(FirebaseVisionText firebaseVisionText);
 }

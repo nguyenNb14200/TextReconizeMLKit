@@ -3,16 +3,12 @@ package com.training.textreconizemlkit.UI.ReadText;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.graphics.Point;
-import android.graphics.Rect;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
@@ -29,7 +25,7 @@ public class ReadTextPresenter {
     TranslatorOptions options;
     Translator modelTranslator;
     public String fromLanguage = "";
-    public String toLanguage   = "";
+    public String toLanguage = "";
 
     public ReadTextPresenter(ActionWithText actionWithText, Context context) {
         this.actionWithText = actionWithText;
@@ -43,7 +39,7 @@ public class ReadTextPresenter {
                 .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
                     @Override
                     public void onSuccess(FirebaseVisionText firebaseVisionText) {
-                        getResultTextRecognize(firebaseVisionText);
+                        actionWithText.OnReadTextSuccess(firebaseVisionText);
                     }
                 })
                 .addOnFailureListener(
@@ -55,20 +51,7 @@ public class ReadTextPresenter {
                         });
     }
 
-    public void getResultTextRecognize(FirebaseVisionText result) {
-        String[] resultTextMuntipleLine = {""};
-        String resultTextOneLine ="";
-        for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
-            String blockText = block.getText();
-            Point[] blockCornerPoints = block.getCornerPoints();
-            Rect blockFrame = block.getBoundingBox();
-            resultTextMuntipleLine[0] = resultTextMuntipleLine[0] + "\n \n" + blockText;
-            resultTextOneLine = resultTextOneLine + block;
-        }
-        actionWithText.OnReadTextSuccess(resultTextMuntipleLine[0]);
-    }
-
-    public Bitmap turnLeft(Bitmap imageBitmap){
+    public Bitmap turnLeft(Bitmap imageBitmap) {
         Matrix matrix = new Matrix();
         matrix.postRotate(-90);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, imageBitmap.getWidth(), imageBitmap.getHeight(), true);
@@ -77,7 +60,7 @@ public class ReadTextPresenter {
         return imageBitmap;
     }
 
-    public Bitmap turnRight(Bitmap imageBitmap){
+    public Bitmap turnRight(Bitmap imageBitmap) {
         Matrix matrix = new Matrix();
         matrix.postRotate(-90);
         Bitmap scaledBitmap = Bitmap.createScaledBitmap(imageBitmap, imageBitmap.getWidth(), imageBitmap.getHeight(), true);
@@ -85,16 +68,17 @@ public class ReadTextPresenter {
         imageBitmap = rotatedBitmap;
         return imageBitmap;
     }
-    public void createModelTranslate(){
+
+    public void createModelTranslate() {
         options =
                 new TranslatorOptions.Builder()
                         .setSourceLanguage(fromLanguage)
                         .setTargetLanguage(toLanguage)
                         .build();
-        modelTranslator =  Translation.getClient(options);
+        modelTranslator = Translation.getClient(options);
     }
 
-    public void startTranslate(String text){
+    public void startTranslate(String text) {
         actionWithText.OpenDialogLoadingLanguage();
         modelTranslator.downloadModelIfNeeded()
                 .addOnSuccessListener(
@@ -116,7 +100,7 @@ public class ReadTextPresenter {
                         });
     }
 
-    public void translateText(String text){
+    public void translateText(String text) {
         actionWithText.OpenDialogConvertLanguage();
         modelTranslator.translate(text)
                 .addOnSuccessListener(
