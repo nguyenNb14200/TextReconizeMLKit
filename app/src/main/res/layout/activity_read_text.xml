@@ -59,7 +59,7 @@
 
         </RelativeLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <RelativeLayout
             android:id="@+id/relative_layout_wrapper_photo"
             android:layout_below="@+id/rlToolBar"
             android:layout_width="match_parent"
@@ -69,24 +69,85 @@
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/im_photo_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:scaleType="fitStart"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
-
-            <com.training.textreconizemlkit.UI.ReadText.GraphicOverlay
-                android:id="@+id/graphic_overlay"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                app:layout_constraintBottom_toBottomOf="@id/im_photo_view"
-                app:layout_constraintLeft_toLeftOf="@id/im_photo_view"
-                app:layout_constraintRight_toRightOf="@id/im_photo_view"
-                app:layout_constraintTop_toTopOf="@id/im_photo_view" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                android:scaleType="centerInside"
+                android:adjustViewBounds="true"
+                android:layout_centerHorizontal="true"/>
+
+            <RelativeLayout
+                android:id="@+id/rlDrawBlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true">
+
+                <com.training.textreconizemlkit.Units.GraphicOverlay
+                    android:id="@+id/graphic_overlay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/llAction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:layout_above="@+id/rl_read_text"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp"
+            android:padding="10dp"
+            android:weightSum="5">
+
+            <LinearLayout
+                android:id="@+id/llCrop"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageCompass"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_crop" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center"
+                    android:text="@string/crop"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llScan"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:id="@+id/imageLocation"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/ic_sacne" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:gravity="center"
+                    android:text="@string/Scan"
+                    android:textColor="@color/black"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <RelativeLayout
             android:id="@+id/rl_read_text"

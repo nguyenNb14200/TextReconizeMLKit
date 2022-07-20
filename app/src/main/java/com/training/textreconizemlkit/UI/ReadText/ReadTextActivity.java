@@ -6,14 +6,17 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -23,12 +26,13 @@ import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.gson.Gson;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
-import com.google.mlkit.vision.text.Text;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import com.training.textreconizemlkit.R;
 import com.training.textreconizemlkit.UI.Home.HomeActivity;
+import com.training.textreconizemlkit.Units.GraphicOverlay;
+import com.training.textreconizemlkit.Units.TextGraphic;
 import com.training.textreconizemlkit.databinding.ActivityReadTextBinding;
 import com.training.textreconizemlkit.dialog.CustomDialogTranslate;
 import com.training.textreconizemlkit.handle.CopyHandler;
@@ -47,13 +51,8 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     LinearLayout layoutBottomSheet;
     BottomSheetBehavior sheetBehavior;
     CustomDialogTranslate mCustomDialogTranslate;
-    String fromLanguage = "";
-    String toLanguage = "";
-    TranslatorOptions options;
     final CopyHandler copyHandler = new CopyHandler(this);
-    Translator modelTranslator;
     SweetAlertDialog pDialog;
-    private GraphicOverlay mGraphicOverlay;
     ReadTextPresenter mReadTextPresenter = new ReadTextPresenter(this, this);
 
     @Override
@@ -213,7 +212,8 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
                 imageBitmap = createScaleFactorUsingBitmap(imageBitmap);
                 binding.imPhotoView.setImageBitmap(imageBitmap);
             }
-        }, 2000);
+        }, 1000);
+//        binding.imPhotoView.setImageBitmap(imageBitmap);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
     }
 
@@ -266,7 +266,6 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
                 }
             }
         }
-
         for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
             String blockText = block.getText();
             Point[] blockCornerPoints = block.getCornerPoints();
@@ -274,9 +273,18 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
             resultTextMuntipleLine[0] = resultTextMuntipleLine[0] + "\n \n" + blockText;
             resultTextOneLine = resultTextOneLine + block;
         }
-
+        RectF margin = calculateRectOnScreen(binding.imPhotoView);
         Toast.makeText(ReadTextActivity.this, "Recognizer success", Toast.LENGTH_SHORT).show();
         sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         binding.bottomSheet.tvTextResult.setText(resultTextMuntipleLine[0]);
+    }
+
+    public  RectF calculateRectOnScreen(View view) {
+        int[] location = new int[2];
+        view.getLocationOnScreen(location);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+        lp.setMargins(location[0], 0, 0, 0);
+        binding.rlDrawBlock.setLayoutParams(lp);
+        return new RectF(location[0], location[1], location[0] + view.getMeasuredWidth(), location[1] + view.getMeasuredHeight());
     }
 }

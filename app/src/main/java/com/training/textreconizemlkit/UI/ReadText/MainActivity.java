@@ -43,6 +43,8 @@
 //import com.google.mlkit.vision.text.Text;
 //import com.google.mlkit.vision.text.TextRecognition;
 //import com.google.mlkit.vision.text.TextRecognizer;
+//import com.training.textreconizemlkit.Units.GraphicOverlay;
+//import com.training.textreconizemlkit.Units.TextGraphic;
 //
 //import java.io.IOException;
 //import java.io.InputStream;

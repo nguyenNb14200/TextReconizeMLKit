@@ -18,4 +18,8 @@
     <string name="exit">Exit</string>
     <string name="From">From</string>
     <string name="To">To</string>
+    <string name="crop">Crop</string>
+    <string name="Scan">Scan</string>
+
+
 </resources>

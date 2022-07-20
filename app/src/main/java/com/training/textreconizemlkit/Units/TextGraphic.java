@@ -1,4 +1,4 @@
-package com.training.textreconizemlkit.UI.ReadText;
+package com.training.textreconizemlkit.Units;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -6,7 +6,6 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.Log;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.training.textreconizemlkit.UI.ReadText.GraphicOverlay;
 
 /**
  * Graphic instance for rendering FirebaseVisionTextBlock position, size, and ID within an associated graphic
@@ -17,13 +16,13 @@ public class TextGraphic extends GraphicOverlay.Graphic {
     private static final String TAG = "FirebaseVisionTextGraphic";
     private static final int FirebaseVisionText_COLOR = Color.RED;
     private static final float FirebaseVisionText_SIZE = 54.0f;
-    private static final float STROKE_WIDTH = 4.0f;
+    private static final float STROKE_WIDTH = 2.0f;
 
     private final Paint rectPaint;
     private final Paint FirebaseVisionTextPaint;
     private final FirebaseVisionText.Element element;
 
-    TextGraphic(GraphicOverlay overlay, FirebaseVisionText.Element element) {
+    public TextGraphic(GraphicOverlay overlay, FirebaseVisionText.Element element) {
         super(overlay);
 
         this.element = element;
