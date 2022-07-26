@@ -31,7 +31,8 @@
                 android:layout_alignParentEnd="true"
                 android:layout_marginTop="10dp"
                 android:layout_marginEnd="20dp"
-                android:src="@drawable/ic_cancel" />
+                android:src="@drawable/ic_cancel"
+                android:visibility="gone"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -75,6 +76,11 @@
                 android:adjustViewBounds="true"
                 android:layout_centerHorizontal="true"/>
 
+<!--            <com.training.textreconizemlkit.Units.CropImage-->
+<!--                android:id="@+id/im_crop_view"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:visibility="gone"/>-->
             <RelativeLayout
                 android:id="@+id/rlDrawBlock"
                 android:layout_width="wrap_content"
@@ -153,10 +159,10 @@
             android:id="@+id/rl_read_text"
             android:layout_width="wrap_content"
             android:layout_height="45dp"
-            android:background="@drawable/bg_button_read_text"
-            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="20dp">
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_button_read_text">
 
             <TextView
                 android:layout_width="wrap_content"

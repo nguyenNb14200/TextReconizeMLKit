@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -13,6 +14,8 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+import com.google.mlkit.nl.languageid.LanguageIdentification;
+import com.google.mlkit.nl.languageid.LanguageIdentifier;
 import com.google.mlkit.nl.translate.Translation;
 import com.google.mlkit.nl.translate.Translator;
 import com.google.mlkit.nl.translate.TranslatorOptions;
@@ -118,5 +121,26 @@ public class ReadTextPresenter {
                                 actionWithText.HideDialogLoadingLanguage();
                             }
                         });
+    }
+
+    public void IdentifyLanguage(String text){
+        LanguageIdentifier languageIdentifier =
+                LanguageIdentification.getClient();
+        languageIdentifier.identifyLanguage(text)
+                .addOnSuccessListener(
+                        new OnSuccessListener<String>() {
+                            @Override
+                            public void onSuccess(@Nullable String languageCode) {
+                                actionWithText.OnIdentifyLanguageSuccess(languageCode);
+                            }
+                        })
+                .addOnFailureListener(
+                        new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                actionWithText.OnIdentifyLanguageFail();
+                            }
+                        });
+
     }
 }

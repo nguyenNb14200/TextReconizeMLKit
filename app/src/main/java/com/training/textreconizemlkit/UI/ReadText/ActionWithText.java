@@ -10,4 +10,6 @@ public interface ActionWithText {
     void OnTranslateFail(String text);
     void OnReadTextFail();
     void OnReadTextSuccess(FirebaseVisionText firebaseVisionText);
+    void OnIdentifyLanguageSuccess(String language);
+    void OnIdentifyLanguageFail();
 }

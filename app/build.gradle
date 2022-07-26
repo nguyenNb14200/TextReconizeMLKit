@@ -24,11 +24,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
     buildFeatures {
         viewBinding = true
@@ -76,6 +77,10 @@ dependencies {
 
     //translate mlkit
     implementation 'com.google.mlkit:translate:17.0.0'
+    implementation 'com.google.mlkit:language-id:17.0.4'
     //dialog await
     implementation 'com.github.f0ris.sweetalert:library:1.6.2'
+
+    //crope image
+    implementation 'com.github.bumptech.glide:glide:4.13.2'
 }

@@ -45,6 +45,9 @@
         <activity
             android:name=".UI.ReadText.ReadTextActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.yalantis.ucrop.UCropActivity"
+            android:screenOrientation="portrait" />
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="com.training.textreconizemlkit.provider"

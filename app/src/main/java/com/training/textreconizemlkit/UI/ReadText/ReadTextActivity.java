@@ -4,33 +4,29 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.gson.Gson;
-import com.google.mlkit.nl.translate.Translator;
-import com.google.mlkit.nl.translate.TranslatorOptions;
 import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 import com.training.textreconizemlkit.R;
 import com.training.textreconizemlkit.UI.Home.HomeActivity;
+import com.training.textreconizemlkit.Units.CropImage;
 import com.training.textreconizemlkit.Units.GraphicOverlay;
 import com.training.textreconizemlkit.Units.TextGraphic;
 import com.training.textreconizemlkit.databinding.ActivityReadTextBinding;
@@ -38,6 +34,7 @@ import com.training.textreconizemlkit.dialog.CustomDialogTranslate;
 import com.training.textreconizemlkit.handle.CopyHandler;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
 
@@ -46,7 +43,8 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     ActivityReadTextBinding binding;
 
     TextRecognizer recognizer;
-    Bitmap imageBitmap;
+    Bitmap imageBitmapPrimary;
+    Bitmap imageBitmapCrop;
     Gson gson = new Gson();
     LinearLayout layoutBottomSheet;
     BottomSheetBehavior sheetBehavior;
@@ -54,6 +52,9 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     final CopyHandler copyHandler = new CopyHandler(this);
     SweetAlertDialog pDialog;
     ReadTextPresenter mReadTextPresenter = new ReadTextPresenter(this, this);
+    Boolean isReadText = true;
+    Uri srouceUri;
+    //CropImage cropImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +62,10 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         ActivityReadTextBinding inflate = ActivityReadTextBinding.inflate(getLayoutInflater());
         this.binding = inflate;
         setContentView(inflate.getRoot());
-
         layoutBottomSheet = findViewById(R.id.bottom_sheet);
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
-
+        //cropImage = findViewById(R.id.im_crop_view);
         setupProcessDialog();
         initData();
         try {
@@ -108,23 +108,25 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         binding.rlReadText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mReadTextPresenter.readTextOnPhoto(imageBitmap);
+                mReadTextPresenter.readTextOnPhoto(imageBitmapCrop);
             }
         });
 
         binding.turnLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageBitmap = mReadTextPresenter.turnLeft(imageBitmap);
-                binding.imPhotoView.setImageBitmap(imageBitmap);
+                imageBitmapPrimary = mReadTextPresenter.turnLeft(imageBitmapPrimary);
+                imageBitmapCrop = imageBitmapPrimary;
+                binding.imPhotoView.setImageBitmap(imageBitmapCrop);
             }
         });
 
         binding.turnRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageBitmap = mReadTextPresenter.turnRight(imageBitmap);
-                binding.imPhotoView.setImageBitmap(imageBitmap);
+                imageBitmapPrimary = mReadTextPresenter.turnRight(imageBitmapPrimary);
+                imageBitmapCrop = imageBitmapPrimary;
+                binding.imPhotoView.setImageBitmap(imageBitmapCrop);
             }
         });
 
@@ -190,6 +192,19 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
 
             }
         });
+
+        binding.llCrop.setOnClickListener(v -> {
+            //cropImage.setVisibility(View.VISIBLE);
+        });
+
+        binding.bottomSheet.imgIdentifyLanguage.setOnClickListener(v -> {
+            mReadTextPresenter.IdentifyLanguage(binding.bottomSheet.tvTextResult.getText().toString());
+        });
+
+        binding.llScan.setOnClickListener(v -> {
+            isReadText = false;
+            mReadTextPresenter.readTextOnPhoto(imageBitmapCrop);
+        });
     }
 
     private void setupProcessDialog() {
@@ -200,21 +215,25 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     }
 
     private void initView() throws IOException {
-        imageBitmap = BitmapFactory.decodeFile(getIntent().getStringExtra("image_path"));
-        if (imageBitmap == null) {
+        srouceUri = Uri.parse(getIntent().getStringExtra("image_path"));
+        imageBitmapPrimary = BitmapFactory.decodeFile(getIntent().getStringExtra("image_path"));
+        if (imageBitmapPrimary == null) {
             Uri imageUri = Uri.parse(getIntent().getStringExtra("image_path"));
-            imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            imageBitmapPrimary = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
         }
-        binding.imPhotoView.setImageBitmap(imageBitmap);
+        binding.imPhotoView.setImageBitmap(imageBitmapPrimary);
+        imageBitmapCrop = imageBitmapPrimary;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                imageBitmap = createScaleFactorUsingBitmap(imageBitmap);
-                binding.imPhotoView.setImageBitmap(imageBitmap);
+                imageBitmapPrimary = createScaleFactorUsingBitmap(imageBitmapPrimary);
+                binding.imPhotoView.setImageBitmap(imageBitmapPrimary);
             }
         }, 1000);
 //        binding.imPhotoView.setImageBitmap(imageBitmap);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+//        cropImage = new CropImage(this);
+//        cropImage.setImageBitmap(imageBitmapPrimary);
     }
 
     @Override
@@ -252,7 +271,6 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
 
     @Override
     public void OnReadTextSuccess(FirebaseVisionText result) {
-
         String[] resultTextMuntipleLine = {""};
         String resultTextOneLine = "";
 
@@ -266,25 +284,40 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
                 }
             }
         }
-        for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
-            String blockText = block.getText();
-            Point[] blockCornerPoints = block.getCornerPoints();
-            Rect blockFrame = block.getBoundingBox();
-            resultTextMuntipleLine[0] = resultTextMuntipleLine[0] + "\n \n" + blockText;
-            resultTextOneLine = resultTextOneLine + block;
+        if(isReadText){
+            for (FirebaseVisionText.TextBlock block : result.getTextBlocks()) {
+                String blockText = block.getText();
+                resultTextMuntipleLine[0] = resultTextMuntipleLine[0] + "\n" + blockText;
+                resultTextOneLine = resultTextOneLine + block;
+            }
+            calculateRectOnScreen(binding.imPhotoView);
+            Toast.makeText(ReadTextActivity.this, "Recognizer success", Toast.LENGTH_SHORT).show();
+            sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            binding.bottomSheet.tvTextResult.setText(resultTextMuntipleLine[0]);
+        } else {
+            calculateRectOnScreen(binding.imPhotoView);
+            Toast.makeText(this, "scan text success", Toast.LENGTH_SHORT).show();
         }
-        RectF margin = calculateRectOnScreen(binding.imPhotoView);
-        Toast.makeText(ReadTextActivity.this, "Recognizer success", Toast.LENGTH_SHORT).show();
-        sheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        binding.bottomSheet.tvTextResult.setText(resultTextMuntipleLine[0]);
+        isReadText = true;
     }
 
-    public  RectF calculateRectOnScreen(View view) {
+    @Override
+    public void OnIdentifyLanguageSuccess(String language) {
+        Locale loc = new Locale(language);
+        String name = loc.getDisplayLanguage(loc);
+        Toast.makeText(this, name, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void OnIdentifyLanguageFail() {
+        Toast.makeText(this, "Identify Language Fail", Toast.LENGTH_LONG).show();
+    }
+
+    public void calculateRectOnScreen(View view) {
         int[] location = new int[2];
         view.getLocationOnScreen(location);
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
         lp.setMargins(location[0], 0, 0, 0);
         binding.rlDrawBlock.setLayoutParams(lp);
-        return new RectF(location[0], location[1], location[0] + view.getMeasuredWidth(), location[1] + view.getMeasuredHeight());
     }
 }
