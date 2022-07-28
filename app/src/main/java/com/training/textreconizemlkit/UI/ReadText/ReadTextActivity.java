@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.method.ScrollingMovementMethod;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
@@ -54,7 +55,7 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
     ReadTextPresenter mReadTextPresenter = new ReadTextPresenter(this, this);
     Boolean isReadText = true;
     Uri srouceUri;
-    //CropImage cropImage;
+    CropImage cropImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +66,7 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         layoutBottomSheet = findViewById(R.id.bottom_sheet);
         recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS);
         sheetBehavior = BottomSheetBehavior.from(layoutBottomSheet);
-        //cropImage = findViewById(R.id.im_crop_view);
+        cropImage = findViewById(R.id.im_crop_view);
         setupProcessDialog();
         initData();
         try {
@@ -109,14 +110,14 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
             @Override
             public void onClick(View v) {
                 mReadTextPresenter.readTextOnPhoto(imageBitmapCrop);
+                binding.graphicOverlay.setVisibility(View.VISIBLE);
             }
         });
 
         binding.turnLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageBitmapPrimary = mReadTextPresenter.turnLeft(imageBitmapPrimary);
-                imageBitmapCrop = imageBitmapPrimary;
+                imageBitmapCrop = mReadTextPresenter.turnLeft(imageBitmapCrop);
                 binding.imPhotoView.setImageBitmap(imageBitmapCrop);
             }
         });
@@ -124,8 +125,7 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         binding.turnRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                imageBitmapPrimary = mReadTextPresenter.turnRight(imageBitmapPrimary);
-                imageBitmapCrop = imageBitmapPrimary;
+                imageBitmapCrop = mReadTextPresenter.turnRight(imageBitmapCrop);
                 binding.imPhotoView.setImageBitmap(imageBitmapCrop);
             }
         });
@@ -194,7 +194,12 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         });
 
         binding.llCrop.setOnClickListener(v -> {
-            //cropImage.setVisibility(View.VISIBLE);
+            cropImage.setVisibility(View.VISIBLE);
+            cropImage.setImageBitmap(imageBitmapCrop);
+            binding.icSave.setVisibility(View.VISIBLE);
+            binding.imPhotoView.setVisibility(View.GONE);
+            binding.graphicOverlay.setVisibility(View.GONE);
+            calculateRectOnScreen(binding.imPhotoView);
         });
 
         binding.bottomSheet.imgIdentifyLanguage.setOnClickListener(v -> {
@@ -204,6 +209,21 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
         binding.llScan.setOnClickListener(v -> {
             isReadText = false;
             mReadTextPresenter.readTextOnPhoto(imageBitmapCrop);
+            binding.graphicOverlay.setVisibility(View.VISIBLE);
+        });
+
+        binding.icSave.setOnClickListener(v -> {
+            imageBitmapCrop = cropImage.getImageBitmap();
+            binding.icSave.setVisibility(View.GONE);
+        });
+
+        binding.llRefresh.setOnClickListener(v -> {
+            binding.imPhotoView.setImageBitmap(imageBitmapPrimary);
+            imageBitmapCrop = imageBitmapPrimary;
+            binding.imPhotoView.setVisibility(View.VISIBLE);
+            cropImage.setVisibility(View.GONE);
+            cropImage.clearPaint();
+            binding.graphicOverlay.setVisibility(View.GONE);
         });
     }
 
@@ -222,18 +242,16 @@ public class ReadTextActivity extends AppCompatActivity implements ActionWithTex
             imageBitmapPrimary = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
         }
         binding.imPhotoView.setImageBitmap(imageBitmapPrimary);
-        imageBitmapCrop = imageBitmapPrimary;
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 imageBitmapPrimary = createScaleFactorUsingBitmap(imageBitmapPrimary);
                 binding.imPhotoView.setImageBitmap(imageBitmapPrimary);
+                imageBitmapCrop = imageBitmapPrimary;
             }
-        }, 1000);
+        }, 500);
 //        binding.imPhotoView.setImageBitmap(imageBitmap);
         sheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-//        cropImage = new CropImage(this);
-//        cropImage.setImageBitmap(imageBitmapPrimary);
     }
 
     @Override
