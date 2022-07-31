@@ -27,7 +27,7 @@ public class CropImage extends View {
         paint = new Paint();
         paint.setStyle(Paint.Style.STROKE);
         paint.setColor(Color.RED);
-        paint.setStrokeWidth(5f);
+        paint.setStrokeWidth(8f);
     }
 
     public void clearPaint(){
@@ -44,7 +44,7 @@ public class CropImage extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        paint.setStrokeWidth(5f);
+        paint.setStrokeWidth(8f);
         canvas.drawBitmap(bitmap, 0, 0, null);
         canvas.drawPath(path, paint);
     }
